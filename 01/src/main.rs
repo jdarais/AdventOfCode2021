@@ -27,23 +27,10 @@ fn main() -> Result<(), i32> {
     let file_name = &args[1];
     let file = File::open(file_name).unwrap();
 
-    let mut reader = BufReader::new(file);
+    let reader = BufReader::new(file);
 
-    let mut lines: Vec<String> = Vec::new();
-
-    loop {
-        let mut line = String::new();
-        match reader.read_line(&mut line) {
-            Ok(bytes_read) => match bytes_read {
-                0 => { break; }
-                _ => { lines.push(line); }
-            },
-            Err(e) => {
-                println!("{}", e);
-                break;
-            }
-        }
-    }
+    let lines_res: Result<Vec<String>, _> = reader.lines().collect();
+    let lines = lines_res.unwrap();
 
     let depths_parsed_res: Result<Vec<u64>, _> = lines.iter().map(|line| str::parse::<u64>(line.trim())).collect();
     let depths = depths_parsed_res.unwrap();
